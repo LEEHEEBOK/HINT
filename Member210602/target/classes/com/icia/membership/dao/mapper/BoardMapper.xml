@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bm">
+	<!-- 글쓰기 -->
+	<insert id="boardwrite" parameterType="boarddto">
+		INSERT INTO BOARD210602
+		(BNUMBER, BTITLE, BWRITER, BCONTENTS, BFILENAME) VALUES
+		(BOARD210602_SEQ.NEXTVAL,#{btitle},#{bwriter},#{bcontents},#{bfilename})
+	</insert>
+
+	<!-- 페이징 -->
+	<!-- 게시글 갯수 가지고 오기 -->
+	<select id="listcount" resultType="int">
+		SELECT COUNT(BNUMBER) FROM
+		BOARD210602
+	</select>
+
+	<!-- boardlist 가져오기 -->
+	<select id="boardpaging" parameterType="pagedto"
+		resultType="boarddto">
+		SELECT * FROM (SELECT B.*, ROW_NUMBER() OVER(ORDER BY
+		BNUMBER DESC)
+		AS RN FROM BOARD210602 B) WHERE RN BETWEEN #{startRow}
+		AND #{endRow}
+	</select>
+
+	<!-- 글 조회 -->
+	<select id="boardview" parameterType="int" resultType="boarddto">
+		SELECT *
+		FROM BOARD210602 WHERE BNUMBER=#{bnumber}
+	</select>
+
+	<!-- 글 삭제 -->
+	<delete id="boarddelete" parameterType="int">
+		DELETE FROM BOARD210602
+		WHERE BNUMBER=#{bnumber}
+	</delete>
+
+	<!-- 글 조회 요청 -->
+	<select id="boardupdate" parameterType="int"
+		resultType="boarddto">
+		SELECT * FROM BOARD210602 WHERE BNUMBER=#{bnumber}
+	</select>
+
+	<!-- 글 수정 처리 -->
+	<update id="updateprocess" parameterType="boarddto">
+		UPDATE BOARD210602 SET
+		BTITLE = #{btitle}, BCONTENTS = #{bcontents}, BFILENAME = #{bfilename}
+		WHERE BNUMBER=#{bnumber}
+	</update>
+
+	<!-- 검색 -->
+	<select id="boardsearch" parameterType="java.util.HashMap"
+		resultType="boarddto">
+		SELECT * FROM BOARD210602
+		<include refid="search"></include>
+	</select>
+
+	<sql id="search">
+		<choose>
+			<when test="type == 'btitle'">
+				WHERE BTITLE LIKE '%'||#{word}||'%'
+			</when>
+			<when test="type == 'bwriter'">
+				WHERE BWRITER LIKE '%'||#{word}||'%'
+			</when>
+		</choose>
+	</sql>
+
+	<!-- 내가 작성한 글 보기 -->
+	<select id="boardwritelist" parameterType="String" resultType="boarddto">
+		SELECT * FROM BOARD210602 WHERE BWRITER=#{bwriter}
+	</select>
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
